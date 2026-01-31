@@ -10,6 +10,6 @@
 #include <stdbool.h>
 #include "structs.h"
 
-
+void main();
 
 #endif
