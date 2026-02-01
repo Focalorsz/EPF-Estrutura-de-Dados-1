@@ -1,6 +1,5 @@
-#ifndef funcoes.h
+#ifndef FUNCOES_H
 #define funcoes.h
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -14,6 +13,8 @@ void listarClientes(Cliente *lista);
 Cliente* buscarCliente(Cliente *lista, char cpf[]);
 void editarCliente(Cliente *lista);
 void removerCliente(Cliente **lista);
-void main();
+void menuPrincipal(Cliente **listaClientes);
+void menuGerenciarClientes(Cliente **listaClientes);
+
 
 #endif
