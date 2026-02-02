@@ -72,6 +72,42 @@ void imprime (produtos * Lista_Encadeada_Produtos){
     }
 }
 
+void cadastrarCliente(Cliente **lista){
+
+    Cliente *novo = (Cliente *) malloc(sizeof(Cliente));
+
+    if(novo == NULL){
+        printf("Erro: Falha na alocação da memória!\n");
+        sleep(2);
+        return;
+    }
+
+    system("clear");
+    printf("---------- CADASTRO DE CLIENTE ----------\n");
+    
+    getchar(); //limpa '\n' do scanf
+    scanf("Nome completo: ");
+    scanf("%[^\n]", novo -> nome);
+    getchar();
+
+    printf("CPF (apenas números): ");
+    scanf("%[^\n]", novo->cpf);
+    getchar();
+
+    printf("E-mail: ");
+    scanf("%[^\n]", novo->email);
+    getchar();
+
+    printf("Telefone: ");
+    scanf("%[^\n]", novo->telefone);
+
+    novo->prox = *lista;
+    *lista = novo;
+
+    printf("\nCliente cadastrado com sucesso!\n");
+    sleep(1);
+}
+
 void menuPrincipal(Cliente **listaClientes) {
     int opcao = -1;
     Cliente *listaClientes = NULL; 
