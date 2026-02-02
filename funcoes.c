@@ -61,37 +61,87 @@ void menuGerenciarClientes(){
     } while(opcao != 0);
 }
     
+produtos * reserva_celula_cabeca() {
+    produtos * Lista_Encadeada_Produtos;
+    Lista_Encadeada_Produtos = calloc(1,sizeof(produtos));
+    Lista_Encadeada_Produtos->prox = NULL;
 
-void imprime (produtos * Lista_Encadeada_Produtos){
-    if (Lista_Encadeada_Produtos != NULL){
-        printf("%d\n", Lista_Encadeada_Produtos->codigo);
-        printf("%s\n", Lista_Encadeada_Produtos->nome);
-        printf("%2f\n", Lista_Encadeada_Produtos->preco);
-        printf("%d\n", Lista_Encadeada_Produtos->quantidade);
-        printf("%s\n", Lista_Encadeada_Produtos->descricao);
-        imprime (Lista_Encadeada_Produtos->prox);
+    return Lista_Encadeada_Produtos;
+}
+
+void listar_produtos (produtos * Lista_Encadeada_Produtos){
+    produtos *ponteiro_auxiliar;
+    for(ponteiro_auxiliar = Lista_Encadeada_Produtos->prox;ponteiro_auxiliar!= NULL; ponteiro_auxiliar = ponteiro_auxiliar->prox){
+        printf("%d\n", ponteiro_auxiliar->codigo);
+        printf("%s\n", ponteiro_auxiliar->nome);
+        printf("%2f\n", ponteiro_auxiliar->preco);
+        printf("%d\n", ponteiro_auxiliar->quantidade);
+        printf("%s\n", ponteiro_auxiliar->descricao);
     }
 }
 
 produtos * busca_codigo(int cod, produtos * Lista_Encadeada_Produtos){
-    if(Lista_Encadeada_Produtos == NULL) return NULL;
+    if(Lista_Encadeada_Produtos->prox == NULL) return NULL;
     if(Lista_Encadeada_Produtos->codigo==cod) return Lista_Encadeada_Produtos;
     return busca_codigo(cod, Lista_Encadeada_Produtos->prox);
 }
 
 produtos * busca_nome(char * palavra_chave, produtos * Lista_Encadeada_Produtos){
-    if (palavra_chave == NULL || Lista_Encadeada_Produtos == NULL) {
+    if (palavra_chave == NULL || Lista_Encadeada_Produtos->prox == NULL) {
         return NULL;
     }
-    produtos * ponteiro_auxiliar = Lista_Encadeada_Produtos;
+    produtos * ponteiro_auxiliar = Lista_Encadeada_Produtos->prox;
     while(ponteiro_auxiliar!=NULL){
-    if(palavra_chave!=NULL && strstr(ponteiro_auxiliar->nome,palavra_chave)==0){
-        return NULL;
+    if(palavra_chave!=NULL && strstr(ponteiro_auxiliar->nome,palavra_chave)!=NULL){
+        return ponteiro_auxiliar;
         }
     
         ponteiro_auxiliar=ponteiro_auxiliar->prox;
     }
-    return ponteiro_auxiliar;
+    return NULL;
+}
+
+void adicionar_produto (int codi,char *nome,float preco,int quant,char *desc, produtos * Lista_Encadeada_Produtos){
+    produtos * novo_produto;
+    novo_produto = calloc(1,sizeof(produtos));
+    novo_produto->codigo = codi;
+    novo_produto->nome = nome;
+    novo_produto->preco = preco;
+    novo_produto->quantidade = quant;
+    novo_produto->descricao = desc;
+    novo_produto->prox = Lista_Encadeada_Produtos->prox;
+    Lista_Encadeada_Produtos->prox = novo_produto;
+
+}
+
+void remove_por_codigo(int cod,produtos * Lista_Encadeada_Produtos){
+    produtos * celula_removida,* celula_seguinte;
+    celula_seguinte = Lista_Encadeada_Produtos;
+    celula_removida = Lista_Encadeada_Produtos->prox;
+
+    while (celula_removida!=NULL && celula_removida->codigo != cod){
+        celula_seguinte = celula_removida;
+        celula_removida = celula_removida->prox;
+    }
+    if(celula_removida != NULL){
+        celula_seguinte->prox=celula_removida->prox;
+        free(celula_removida);
+    }
+}
+
+void remove_por_nome(char palavra_chave,produtos * Lista_Encadeada_Produtos){
+    produtos * celula_removida,* celula_seguinte;
+    celula_seguinte = Lista_Encadeada_Produtos;
+    celula_removida = Lista_Encadeada_Produtos->prox;
+
+    while (celula_removida!=NULL && strcmp(celula_removida->nome,palavra_chave)!=NULL){
+        celula_seguinte = celula_removida;
+        celula_removida = celula_removida->prox;
+    }
+    if(celula_removida != NULL){
+        celula_seguinte->prox=celula_removida->prox;
+        free(celula_removida);
+    }
 }
 
 void cadastrarCliente(Cliente **lista){
