@@ -6,6 +6,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
+#include <ncurses.h>
 #include <stdbool.h>
 #include "structs.h"
 void cadastrarCliente(Cliente **lista);

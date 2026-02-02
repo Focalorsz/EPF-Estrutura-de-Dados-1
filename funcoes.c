@@ -64,12 +64,34 @@ void menuGerenciarClientes(){
 
 void imprime (produtos * Lista_Encadeada_Produtos){
     if (Lista_Encadeada_Produtos != NULL){
-        printf("%d\n", *(Lista_Encadeada_Produtos->codigo));
+        printf("%d\n", Lista_Encadeada_Produtos->codigo);
         printf("%s\n", Lista_Encadeada_Produtos->nome);
         printf("%2f\n", Lista_Encadeada_Produtos->preco);
         printf("%d\n", Lista_Encadeada_Produtos->quantidade);
         printf("%s\n", Lista_Encadeada_Produtos->descricao);
+        imprime (Lista_Encadeada_Produtos->prox);
     }
+}
+
+produtos * busca_codigo(int cod, produtos * Lista_Encadeada_Produtos){
+    if(Lista_Encadeada_Produtos == NULL) return NULL;
+    if(Lista_Encadeada_Produtos->codigo==cod) return Lista_Encadeada_Produtos;
+    return busca_codigo(cod, Lista_Encadeada_Produtos->prox);
+}
+
+produtos * busca_nome(char * palavra_chave, produtos * Lista_Encadeada_Produtos){
+    if (palavra_chave == NULL || Lista_Encadeada_Produtos == NULL) {
+        return NULL;
+    }
+    produtos * ponteiro_auxiliar = Lista_Encadeada_Produtos;
+    while(ponteiro_auxiliar!=NULL){
+    if(palavra_chave!=NULL && strstr(ponteiro_auxiliar->nome,palavra_chave)==0){
+        return NULL;
+        }
+    
+        ponteiro_auxiliar=ponteiro_auxiliar->prox;
+    }
+    return ponteiro_auxiliar;
 }
 
 void cadastrarCliente(Cliente **lista){
