@@ -213,7 +213,36 @@ void removerCliente(Cliente **lista) {
 }
 
 void editarCliente(Cliente *lista) {
-    printf("\nFunção de edição em desenvolvimento...\n");
+    char cpf[12];
+    system("cls");
+    printf("---------- EDITAR CLIENTE ----------\n");
+    printf("Digite o CPF do cliente: ");
+    scanf("%s", cpf);
+
+    Cliente *atual = lista;
+    while (atual != NULL) {
+        if (strcmp(atual->cpf, cpf) == 0) {
+            printf("\nCliente encontrado! Deixe em branco para manter o atual.\n");
+            
+            getchar(); 
+            printf("Novo Nome (Atual: %s): ", atual->nome);
+            scanf("%[^\n]", atual->nome);
+            
+            getchar();
+            printf("Novo E-mail (Atual: %s): ", atual->email);
+            scanf("%[^\n]", atual->email);
+            
+            getchar();
+            printf("Novo Telefone (Atual: %s): ", atual->telefone);
+            scanf("%[^\n]", atual->telefone);
+
+            printf("\nDados atualizados com sucesso!\n");
+            sleep(1);
+            return;
+        }
+        atual = atual->prox;
+    }
+    printf("\nCliente nao encontrado!\n");
     sleep(1);
 }
 
