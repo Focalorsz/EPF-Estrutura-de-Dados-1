@@ -1,8 +1,9 @@
 #include "funcoes.h"
 
-int main(void)
-{
-    main();
 
-return 0;
+
+int main() {
+    Cliente *listaClientes = NULL;
+    menuPrincipal(&listaClientes);
+    return 0;
 }
