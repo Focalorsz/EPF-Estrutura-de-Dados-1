@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "clientes.h"
 #include "produtos.h"
+#include "carrinho.h"
 
 
 
