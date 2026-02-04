@@ -7,6 +7,7 @@
 
 int main() {
     Cliente *listaClientes = NULL;
+    Produto *listaProdutos = NULL;
     menuPrincipal(&listaClientes);
     return 0;
 }

@@ -8,7 +8,6 @@
 #include <math.h>
 #include <ncurses.h>
 #include <stdbool.h>
-#include "structs.h"
 
 typedef struct cliente{
     char cpf[12];
