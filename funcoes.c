@@ -1,4 +1,4 @@
-#include "clientes.h"
+#include "funcoes.h"
 
 void menuGerenciarClientes(Cliente **listaClientes){
     int opcao = -1;
@@ -59,6 +59,39 @@ void menuGerenciarClientes(Cliente **listaClientes){
         }
 
     } while(opcao != 0);
+}
+    
+
+void imprime (produtos * Lista_Encadeada_Produtos){
+    if (Lista_Encadeada_Produtos != NULL){
+        printf("%d\n", Lista_Encadeada_Produtos->codigo);
+        printf("%s\n", Lista_Encadeada_Produtos->nome);
+        printf("%2f\n", Lista_Encadeada_Produtos->preco);
+        printf("%d\n", Lista_Encadeada_Produtos->quantidade);
+        printf("%s\n", Lista_Encadeada_Produtos->descricao);
+        imprime (Lista_Encadeada_Produtos->prox);
+    }
+}
+
+produtos * busca_codigo(int cod, produtos * Lista_Encadeada_Produtos){
+    if(Lista_Encadeada_Produtos == NULL) return NULL;
+    if (Lista_Encadeada_Produtos->codigo == cod) return Lista_Encadeada_Produtos;
+    return busca_codigo(cod, Lista_Encadeada_Produtos->prox);
+}
+
+produtos * busca_nome(char * palavra_chave, produtos * Lista_Encadeada_Produtos){
+    if (palavra_chave == NULL || Lista_Encadeada_Produtos == NULL) {
+        return NULL;
+    }
+    produtos * ponteiro_auxiliar = Lista_Encadeada_Produtos;
+    while(ponteiro_auxiliar!=NULL){
+    if(palavra_chave!=NULL && strstr(ponteiro_auxiliar->nome,palavra_chave)==0){
+        return NULL;
+        }
+    
+        ponteiro_auxiliar=ponteiro_auxiliar->prox;
+    }
+    return ponteiro_auxiliar;
 }
 
 void cadastrarCliente(Cliente **lista){
@@ -211,5 +244,42 @@ void editarCliente(Cliente *lista) {
     }
     printf("\nCliente nao encontrado!\n");
     sleep(1);
+}
+
+void menuPrincipal(Cliente **listaClientes) {
+    int opcao = -1;
+    do {
+        system("cls");
+        printf("----------------- SISTEMA DE VENDAS -----------------\n");
+        printf("* (1) Gerenciamento de Clientes                    *\n");
+        printf("* (2) Gerenciamento de Produtos                    *\n");
+        printf("* (3) Modo Compra                                  *\n");
+        printf("* (0) Sair                                         *\n");
+        printf("-----------------------------------------------------\n");
+        printf(":: Escolha o modulo --> ");
+        
+        if (scanf("%d", &opcao) != 1) {
+            while (getchar() != '\n');
+            continue;
+        }
+
+        switch(opcao) {
+            case 1:
+                menuGerenciarClientes(listaClientes); 
+                break;
+            case 2:
+                
+                break;
+            case 3:
+                
+                break;
+            case 0:
+                printf("\nEncerrando sistema...\n");
+                break;
+            default:
+                printf("\nOpcao invalida!\n");
+                sleep(1);
+        }
+    } while(opcao != 0);
 }
 

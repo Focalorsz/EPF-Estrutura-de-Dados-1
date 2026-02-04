@@ -1,4 +1,6 @@
 #include "produtos.h"
+#include <ctype.h>
+#include <string.h> 
 
 static int proximoCodigo = 1;
 
@@ -16,7 +18,7 @@ int adicionarProduto(Produto **lista, char *nome,float preco, int quantidade){
         return 0;
     }
     if (quantidade <0) {
-        printd("Quantidade nao pode ser negativa!\n");
+        printf("Quantidade nao pode ser negativa!\n");
         return 0;
     }
 
@@ -143,13 +145,13 @@ void editarProduto(Produto *produto){
     float novoPreco;
     int novaQuantidade;
 
-    printf("Editando Produto: %s (Código: %d)\n",produto->nome, produto->codigo);
+    printf("Editando Produto: %s (Codigo: %d)\n",produto->nome, produto->codigo);
     printf("│───────────────────────────────────────────│\n");
 
     printf("Novo nome (atual: %s): ", produto->nome);
     fgets(buffer,sizeof(buffer), stdin);
     buffer[strcspn(buffer, "\n")] = 0;
-    if (srtlen(buffer) > 0){
+    if (strlen(buffer) > 0){
         free(produto->nome);
         produto->nome = strdup(buffer);
     }
@@ -227,7 +229,7 @@ ProdutoNavegacao *atual = navegacao;
 char comando;
 
 do{
-    system("clear");
+    system("cls");
     printf("╔──────────────────────────────────────────╗\n");
     printf("│           『Navegacao de Produtos』        │");
     printf("╚──────────────────────────────────────────╝\n");
@@ -277,27 +279,27 @@ do{
             printf("Comando invalido\n");
             system("sleep 2");
                 }
-    }while (tolowe(comando) != 'h');
+    }while (tolower(comando) != 'h');
 }   
 
 void menuGerenciarProdutos(Produto **lista) {
     int opcao;
 
     do {
-        system("clear");
+        system("cls");
         printf("========================================\n");
         printf("       GERENCIAMENTO DE PRODUTOS\n");
         printf("========================================\n");
         printf("1. Cadastrar Novo Produto\n");
         printf("2. Listar Todos os Produtos\n");
-        printf("3. Buscar Produto por Código\n");
+        printf("3. Buscar Produto por Codigo\n");
         printf("4. Buscar Produto por Nome\n");
         printf("5. Editar Produto\n");
         printf("6. Remover Produto\n");
         printf("7. Navegar Produtos (Modo Visual)\n");
         printf("0. Voltar ao Menu Principal\n");
         printf("========================================\n");
-        printf("Opção: ");
+        printf("Opcao: ");
         scanf("%d", &opcao);
         getchar();
         
@@ -330,19 +332,19 @@ void menuGerenciarProdutos(Produto **lista) {
                 break;
             case 3: {
                 int codigo;
-                printf("Código do produto: ");
+                printf("Codigo do produto: ");
                 scanf("%d", &codigo);
                 getchar();
                 
                 Produto *p = buscarProdutoPorCodigo(*lista, codigo);
                 if (p) {
                     printf("\nProduto encontrado:\n");
-                    printf("Código: %d\n", p->codigo);
+                    printf("Codigo: %d\n", p->codigo);
                     printf("Nome: %s\n", p->nome);
                     printf("Preço: R$ %.2f\n", p->preco);
                     printf("Estoque: %d\n", p->quantidade);
                 } else {
-                    printf("Produto não encontrado.\n");
+                    printf("Produto nao encontrado.\n");
                 }
                 printf("\nPressione Enter para continuar...");
                 getchar();
@@ -357,12 +359,12 @@ void menuGerenciarProdutos(Produto **lista) {
                 Produto *p = buscarProdutoPorNome(*lista, nome);
                 if (p) {
                     printf("\nProduto encontrado:\n");
-                    printf("Código: %d\n", p->codigo);
+                    printf("Codigo: %d\n", p->codigo);
                     printf("Nome: %s\n", p->nome);
                     printf("Preço: R$ %.2f\n", p->preco);
                     printf("Estoque: %d\n", p->quantidade);
                 } else {
-                    printf("Produto não encontrado.\n");
+                    printf("Produto nao encontrado.\n");
                 }
                 printf("\nPressione Enter para continuar...");
                 getchar();
@@ -370,7 +372,7 @@ void menuGerenciarProdutos(Produto **lista) {
             }
             case 5: {
                 int codigo;
-                printf("Código do produto a editar: ");
+                printf("Codigo do produto a editar: ");
                 scanf("%d", &codigo);
                 getchar();
                 
@@ -378,7 +380,7 @@ void menuGerenciarProdutos(Produto **lista) {
                 if (p) {
                     editarProduto(p);
                 } else {
-                    printf("Produto não encontrado.\n");
+                    printf("Produto nao encontrado.\n");
                 }
                 printf("\nPressione Enter para continuar...");
                 getchar();
@@ -386,7 +388,7 @@ void menuGerenciarProdutos(Produto **lista) {
             }
             case 6: {
                 int codigo;
-                printf("Código do produto a remover: ");
+                printf("Codigo do produto a remover: ");
                 scanf("%d", &codigo);
                 getchar();
                 
@@ -404,7 +406,7 @@ void menuGerenciarProdutos(Produto **lista) {
                 printf("Voltando ao menu principal...\n");
                 break;
             default:
-                printf("Opção inválida!\n");
+                printf("Opcaoo invalida!\n");
                 system("sleep 2");
         }
     } while(opcao != 0);

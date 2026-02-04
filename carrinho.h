@@ -1,5 +1,5 @@
-#ifndef CARRINHO.H
-#define CARRINGO.H
+#ifndef CARRINHO_H
+#define CARRINHO_H
 
 #include "produtos.h"
 #include "clientes.h"

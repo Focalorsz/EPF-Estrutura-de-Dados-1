@@ -6,7 +6,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
-#include <ncurses.h>
 #include <stdbool.h>
 
 typedef struct cliente{

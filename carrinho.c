@@ -1,5 +1,6 @@
 #include "carrinho.h"
 
+
 Carrinho* criarCarrinho(){
     Carrinho *novo = (Carrinho*)malloc(sizeof(Carrinho));
     if (!novo) return NULL;
@@ -82,7 +83,7 @@ void listarCarrinho(Carrinho *carrinho){
     printf("========================================\n");
     printf("               CARRINHO\n");
     printf("========================================\n");
-    printf("%-6s %-25s %-8s %-10s %-10s\n","CÓDIGO", "PRODUTO", "QTD", "PREÇO", "SUBTOTAL");
+    printf("%-6s %-25s %-8s %-10s %-10s\n","CODIGO", "PRODUTO", "QTD", "PREÇO", "SUBTOTAL");
     printf("----------------------------------------\n");
 
     ItemCarrinho *atual = carrinho->itens;
@@ -156,7 +157,7 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos){
     Carrinho *carrinhoAtual = NULL;
 
     do{
-        system("clear");
+        system("cls");
         printf("========================================\n");
         printf("               MODO COMPRA\n");
         printf("========================================\n");
@@ -170,14 +171,14 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos){
 
         printf("\n1. Selecionar Cliente\n");
         printf("2. Navegar Produtos\n");
-        printf("3. Buscar Produto por Código\n");
+        printf("3. Buscar Produto por Codigo\n");
         printf("4. Buscar Produto por Nome\n");
         printf("5. Ver Carrinho\n");
         printf("6. Remover Item do Carrinho\n");
         printf("7. Finalizar Compra\n");
         printf("0. Voltar\n");
         printf("========================================\n");
-        printf("Opção: ");
+        printf("Opcao: ");
         scanf("%d", &opcao);
         getchar();
 
@@ -200,7 +201,7 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos){
                 }
                 
                 if (!clienteAtual) {
-                    printf("Cliente não encontrado!\n");
+                    printf("Cliente nao encontrado!\n");
                 }
                 
                 printf("Pressione Enter para continuar...");
@@ -217,16 +218,16 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos){
                         char comando;
                         
                         do {
-                            system("clear");
-                            printf("NAVEGAÇÃO - Adicione produtos com 'A'\n");
+                            system("cls");
+                            printf("NAVEGACAO - Adicione produtos com 'A'\n");
                             Produto *p = atualNav->produto;
                             printf("\nProduto atual:\n");
-                            printf("Código: %d\n", p->codigo);
+                            printf("Codigo: %d\n", p->codigo);
                             printf("Nome: %s\n", p->nome);
                             printf("Preço: R$ %.2f\n", p->preco);
                             printf("Estoque: %d\n", p->quantidade);
                             
-                            printf("\nComandos: [P] Anterior, [N] Próximo, [A] Adicionar, [H] Voltar\n");
+                            printf("\nComandos: [P] Anterior, [N] Proximo, [A] Adicionar, [H] Voltar\n");
                             printf("Comando: ");
                             comando = getchar();
                             getchar();
@@ -264,7 +265,7 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos){
                     printf("Selecione um cliente primeiro!\n");
                 } else {
                     int codigo, quantidade;
-                    printf("Código do produto: ");
+                    printf("Codigo do produto: ");
                     scanf("%d", &codigo);
                     
                     Produto *p = buscarProdutoPorCodigo(*listaProdutos, codigo);
@@ -277,7 +278,7 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos){
                             printf("Produto adicionado ao carrinho!\n");
                         }
                     } else {
-                        printf("Produto não encontrado.\n");
+                        printf("Produto nAo encontrado.\n");
                     }
                 }
                 printf("Pressione Enter para continuar...");
@@ -306,7 +307,7 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos){
                             printf("Produto adicionado ao carrinho!\n");
                         }
                     } else {
-                        printf("Produto não encontrado.\n");
+                        printf("Produto nao encontrado.\n");
                     }
                 }
                 printf("Pressione Enter para continuar...");
@@ -326,7 +327,7 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos){
                 if (carrinhoAtual) {
                     int codigo;
                     listarCarrinho(carrinhoAtual);
-                    printf("\nCódigo do produto a remover: ");
+                    printf("\nCodigo do produto a remover: ");
                     scanf("%d", &codigo);
                     
                     if (removerDoCarrinho(carrinhoAtual, codigo)) {
@@ -357,4 +358,17 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos){
                 break;
         }
     } while(opcao != 0);
+}
+
+void liberarCarrinho(Carrinho *carrinho) {
+    if (carrinho == NULL) return;
+
+    ItemCarrinho *atual = carrinho->itens;
+    while (atual != NULL) {
+        ItemCarrinho *proximo = atual->prox;
+        free(atual);
+        atual = proximo;
+    }
+
+    free(carrinho);
 }
