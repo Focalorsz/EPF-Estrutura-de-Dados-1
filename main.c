@@ -8,6 +8,9 @@
 int main() {
     Cliente *listaClientes = NULL;
     Produto *listaProdutos = NULL;
+
     menuPrincipal(&listaClientes);
+
+    liberarTodosProdutos(&listaProdutos);
     return 0;
 }
