@@ -76,19 +76,23 @@ void cadastrarCliente(Cliente **lista){
     
     getchar(); //limpa '\n' do scanf
     printf("Nome completo: ");
-    scanf("%[^\n]", novo -> nome);
+    scanf(" %[^\n]", novo -> nome);
+    getchar();
+
+    printf("Digite a data de nascimento (DD/MM/AAAA): ");
+    scanf(" %[^\n]", novo->data_nascimento);
     getchar();
 
     printf("CPF (apenas numeros): ");
-    scanf("%[^\n]", novo->cpf);
+    scanf(" %[^\n]", novo->cpf);
     getchar();
 
     printf("E-mail: ");
-    scanf("%[^\n]", novo->email);
+    scanf(" %[^\n]", novo->email);
     getchar();
 
     printf("Telefone: ");
-    scanf("%[^\n]", novo->telefone);
+    scanf(" %[^\n]", novo->telefone);
 
     novo->prox = *lista;
     *lista = novo;
@@ -106,9 +110,10 @@ void listarClientes(Cliente *lista) {
         printf("Nenhum cliente cadastrado no momento.\n");
     } else {
         while (atual != NULL) {
-            printf("Nome:     %s\n", atual->nome);
-            printf("CPF:      %s\n", atual->cpf);
-            printf("E-mail:   %s\n", atual->email);
+            printf("Nome: %s\n", atual->nome);
+            printf("Data de Nascimento: %s\n", atual->data_nascimento);
+            printf("CPF: %s\n", atual->cpf);
+            printf("E-mail: %s\n", atual->email);
             printf("Telefone: %s\n", atual->telefone);
             printf("----------------------------------------------------\n");
             
@@ -133,6 +138,7 @@ void buscarCliente(Cliente *lista, char cpf[]) {
         if (strcmp(atual->cpf, cpf) == 0) {
             printf("\nCliente Encontrado:\n");
             printf("Nome: %s\n", atual->nome);
+            printf("Data de Nascimento: %s\n", atual->data_nascimento);
             printf("Email: %s\n", atual->email);
             printf("Telefone: %s\n", atual->telefone);
             encontrado = 1;
@@ -194,6 +200,10 @@ void editarCliente(Cliente *lista) {
             getchar(); 
             printf("Novo Nome (Atual: %s): ", atual->nome);
             scanf("%[^\n]", atual->nome);
+
+            getchar(); 
+            printf("Nova data de Nascimento (Atual: %s): ", atual->data_nascimento);
+            scanf("%[^\n]", atual->data_nascimento);
             
             getchar();
             printf("Novo E-mail (Atual: %s): ", atual->email);
