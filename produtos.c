@@ -112,15 +112,22 @@ Produto* buscarProdutoPorNome(Produto *lista, char *nome){
 
 void buscarEListarProdutosPorNome(Produto *lista, char *nome) {
     if (!nome || lista == NULL) {
-        printf("Nenhum produto cadastrado.\n");
+        printf("╔═══════════════════════════════════════════════╗\n");
+        printf("║         Nenhum produto cadastrado             ║\n");
+        printf("╚═══════════════════════════════════════════════╝\n");
         return;
     }
 
+    char titulo[50];
+    snprintf(titulo, sizeof(titulo), "Produtos com '%.20s'", nome);
+    
     printf("╔═══════════════════════════════════════════════╗\n");
-    printf("║      Produtos encontrados com '%.20s'           ║\n", nome);
-    if (strlen(nome) > 20) printf("║                (nome truncado)                ║\n");
+    printf("║ %-44s ║\n", titulo);
+    if (strlen(nome) > 20) {
+        printf("║ %-44s ║\n", "(nome truncado)");
+    }
     printf("╠═══════════════════════════════════════════════╣\n");
-    printf("%-6s %-30s %-10s %-10s\n", "CODIGO", "NOME", "PRECO", "ESTOQUE");
+    printf("║ %-6s %-25s %-12s %-8s ║\n", "CODIGO", "NOME", "PRECO", "ESTOQUE");
     printf("╠═══════════════════════════════════════════════╣\n");
 
     Produto *atual = lista;
@@ -128,20 +135,18 @@ void buscarEListarProdutosPorNome(Produto *lista, char *nome) {
     int encontrados = 0;
 
     while (atual != NULL) {
-        // Função para comparar case-insensitive
         char nomeProdutoLower[100];
         char buscaLower[100];
         strcpy(nomeProdutoLower, atual->nome);
         strcpy(buscaLower, nome);
         
-        // Converter para minúsculas
         for(int i = 0; nomeProdutoLower[i]; i++) 
             nomeProdutoLower[i] = tolower(nomeProdutoLower[i]);
         for(int i = 0; buscaLower[i]; i++) 
             buscaLower[i] = tolower(buscaLower[i]);
         
         if (strstr(nomeProdutoLower, buscaLower) != NULL) {
-            printf("%-6d %-30s R$%-9.2f %-10d\n",
+            printf("║ %-6d %-25s R$%-10.2f %-8d ║\n",
                    atual->codigo,
                    atual->nome,
                    atual->preco,
@@ -152,27 +157,30 @@ void buscarEListarProdutosPorNome(Produto *lista, char *nome) {
         contador++;
     }
 
+    printf("╠═══════════════════════════════════════════════╣\n");
+    printf("║ Encontrados: %-5d Total: %-25d ║\n", encontrados, contador);
     printf("╚═══════════════════════════════════════════════╝\n");
-    printf("Encontrados %d de %d produtos\n", encontrados, contador);
 }
 
 void listarTodosProdutos(Produto *lista){
     if (lista == NULL) {
-        printf("Nenhum produto cadastrado. \n");
+        printf("╔═══════════════════════════════════════════════╗\n");
+        printf("║             Nenhum produto cadastrado         ║\n");
+        printf("╚═══════════════════════════════════════════════╝\n");
         return;
     } 
 
-    printf("╔──────────────────────────────────────────╗\n");
-    printf("│                  『Lista de Produtos』         │\n");
-    printf("│───────────────────────────────────────────│\n");
-    printf("%-6s %-30s %-10s %-10s\n", "CODIGO","NOME", "PRECO", "ESTOQUE");
-    printf("│───────────────────────────────────────────│\n");
+    printf("╔═══════════════════════════════════════════════╗\n");
+    printf("║             『Lista de Produtos』              ║\n");
+    printf("╠═══════════════════════════════════════════════╣\n");
+    printf("║ %-6s %-25s %-12s %-8s ║\n", "CODIGO", "NOME", "PRECO", "ESTOQUE");
+    printf("╠═══════════════════════════════════════════════╣\n");
 
     Produto *atual = lista;
     int contador = 0;
 
     while (atual != NULL){
-        printf("%-6d %-30s R$%-9.2f %-10d\n",
+        printf("║ %-6d %-25s R$%-10.2f %-8d ║\n",
         atual->codigo,
         atual->nome,
         atual->preco,
@@ -181,8 +189,9 @@ void listarTodosProdutos(Produto *lista){
         contador++;
     }
 
-    printf("╚──────────────────────────────────────────╝\n");
-    printf("Total de produtos: %d\n",contador);
+    printf("╠═══════════════════════════════════════════════╣\n");
+    printf("║ Total de produtos: %-25d ║\n", contador);
+    printf("╚═══════════════════════════════════════════════╝\n");
 }
 
 void editarProduto(Produto *produto){
@@ -331,21 +340,23 @@ void menuGerenciarProdutos(Produto **lista) {
 
     do {
         clear_screen();
-        printf("========================================\n");
-        printf("       GERENCIAMENTO DE PRODUTOS\n");
-        printf("========================================\n");
-        printf("1. Cadastrar Novo Produto\n");
-        printf("2. Listar Todos os Produtos\n");
-        printf("3. Buscar Produto por Codigo\n");
-        printf("4. Buscar Produto por Nome\n");
-        printf("5. Editar Produto\n");
-        printf("6. Remover Produto\n");
-        printf("7. Navegar Produtos (Modo Visual)\n");
-        printf("0. Voltar ao Menu Principal\n");
-        printf("========================================\n");
-        printf("Opcao: ");
+        printf("╔═══════════════════════════════════════════════╗\n");
+        printf("║        GERENCIAMENTO DE PRODUTOS              ║\n");
+        printf("╠═══════════════════════════════════════════════╣\n");
+        printf("║ 1. Cadastrar Novo Produto                     ║\n");
+        printf("║ 2. Listar Todos os Produtos                   ║\n");
+        printf("║ 3. Buscar Produto por Código                  ║\n");
+        printf("║ 4. Buscar Produto por Nome                    ║\n");
+        printf("║ 5. Editar Produto                             ║\n");
+        printf("║ 6. Remover Produto                            ║\n");
+        printf("║ 7. Navegar Produtos (Modo Visual)             ║\n");
+        printf("║ 0. Voltar ao Menu Principal                   ║\n");
+        printf("╚═══════════════════════════════════════════════╝\n");
+        printf("\n  Opção: ");
         scanf("%d", &opcao);
         getchar();
+        
+        // Resto do código permanece igual...
         
         switch(opcao) {
             case 1: {
