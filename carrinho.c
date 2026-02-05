@@ -1,4 +1,10 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include "carrinho.h"
+#include "produtos.h" 
+#include "clientes.h"
 
 
 Carrinho* criarCarrinho(){
@@ -13,32 +19,35 @@ Carrinho* criarCarrinho(){
     return novo;
 }
 
-int adicionarAoCarrinho(Carrinho *carrinho,Produto *produto, int quantidade){
-    if(!carrinho || !produto || quantidade <=0) return 0;
-
+int adicionarAoCarrinho(Carrinho *carrinho, Produto *produto, int quantidade) {
+    if(!carrinho || !produto || quantidade <= 0) return 0;
+    
     if (produto->quantidade < quantidade) {
-        printf("Ta em falta no estoque. Disponivel: %d\n",produto->quantidade);
+        printf("Estoque insuficiente. Disponível: %d\n", produto->quantidade);
         return 0;
     }
-
+    
     ItemCarrinho *atual = carrinho->itens;
-    while (atual !=NULL){
-        if (atual->produto->codigo == produto->codigo){
+    while (atual != NULL) {
+        if (atual->produto->codigo == produto->codigo) {
             atual->quantidade_desejada += quantidade;
             carrinho->valor_total += produto->preco * quantidade;
-            carrinho ->total_itens += quantidade;
+            carrinho->total_itens += quantidade;
             return 1;
         }
         atual = atual->prox;
     }
-
+    
     ItemCarrinho *novoItem = (ItemCarrinho*)malloc(sizeof(ItemCarrinho));
     if (!novoItem) return 0;
-
+    
     novoItem->produto = produto;
     novoItem->quantidade_desejada = quantidade;
+    novoItem->prox = carrinho->itens;  
+    carrinho->itens = novoItem;
     carrinho->valor_total += produto->preco * quantidade;
-
+    carrinho->total_itens += quantidade;
+    
     return 1;
 }
 
@@ -149,68 +158,81 @@ int finalizarCompra(Carrinho *carrinho, Cliente * cliente){
     return 0;
 }
 
-void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos){
+void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos) {
     if (!listaClientes || !listaProdutos) return;
 
     int opcao;
     Cliente *clienteAtual = NULL;
-    Carrinho *carrinhoAtual = NULL;
 
-    do{
-        system("cls");
-        printf("========================================\n");
-        printf("               MODO COMPRA\n");
-        printf("========================================\n");
-
-        if(clienteAtual){
-            printf("Cliente atual: %s (CPF: %s)\n", clienteAtual->nome,clienteAtual->cpf);
-            printf("Itens no carrinho: %d\n",carrinhoAtual ? carrinhoAtual->total_itens : 0);
-        }else{
-            printf("Nenhum cliente selecionado.\n");
+    do {
+        #ifdef _WIN32
+            system("cls");
+        #else
+            system("clear");
+        #endif
+        printf("\n╔═══════════════════════════════════════════════╗\n");
+        printf("║                 MODO COMPRA                   ║\n");
+        printf("╠═══════════════════════════════════════════════╣\n");
+        
+        if (clienteAtual) {
+            printf("║  Cliente atual: %-29s ║\n", clienteAtual->nome);
+            printf("║  CPF: %-36s ║\n", clienteAtual->cpf);
+            printf("║  Itens no carrinho: %-29d ║\n", 
+                   clienteAtual->carrinho ? clienteAtual->carrinho->total_itens : 0);
+        } else {
+            printf("║           Nenhum cliente selecionado          ║\n");
         }
-
-        printf("\n1. Selecionar Cliente\n");
-        printf("2. Navegar Produtos\n");
-        printf("3. Buscar Produto por Codigo\n");
-        printf("4. Buscar Produto por Nome\n");
-        printf("5. Ver Carrinho\n");
-        printf("6. Remover Item do Carrinho\n");
-        printf("7. Finalizar Compra\n");
-        printf("0. Voltar\n");
-        printf("========================================\n");
-        printf("Opcao: ");
-        scanf("%d", &opcao);
+        
+        printf("╠═══════════════════════════════════════════════╣\n");
+        printf("║  1. Selecionar Cliente                        ║\n");
+        printf("║  2. Navegar Produtos                          ║\n");
+        printf("║  3. Buscar Produto por Código                 ║\n");
+        printf("║  4. Buscar Produto por Nome                   ║\n");
+        printf("║  5. Ver Carrinho                              ║\n");
+        printf("║  6. Remover Item do Carrinho                  ║\n");
+        printf("║  7. Finalizar Compra                          ║\n");
+        printf("║  0. Voltar ao Menu Principal                  ║\n");
+        printf("╚═══════════════════════════════════════════════╝\n");
+        printf("\n  Opção: ");
+        
+        if (scanf("%d", &opcao) != 1) {
+            while (getchar() != '\n');
+            continue;
+        }
         getchar();
 
-        switch(opcao) {
+        switch (opcao) {
             case 1: {
                 char cpf[12];
-                printf("CPF do cliente: ");
+                printf("\n  CPF do cliente: ");
                 scanf("%11s", cpf);
+                getchar();
                 
                 Cliente *atual = *listaClientes;
+                int encontrado = 0;
+                
                 while (atual != NULL) {
                     if (strcmp(atual->cpf, cpf) == 0) {
                         clienteAtual = atual;
-                        // (Nesse momentos descobrimos que a lógica de carrinho devia cosiderar que ele esta contido em clientes.)
-                        carrinhoAtual = criarCarrinho();
-                        printf("Cliente selecionado: %s\n", clienteAtual->nome);
+                        printf("\n  ✅ Cliente selecionado: %s\n", clienteAtual->nome);
+                        encontrado = 1;
                         break;
                     }
                     atual = atual->prox;
                 }
                 
-                if (!clienteAtual) {
-                    printf("Cliente nao encontrado!\n");
+                if (!encontrado) {
+                    printf("\n  ❌ Cliente não encontrado!\n");
                 }
                 
-                printf("Pressione Enter para continuar...");
+                printf("\n  Pressione Enter para continuar...");
                 getchar();
                 break;
             }
+            
             case 2: {
                 if (!clienteAtual) {
-                    printf("Selecione um cliente primeiro!\n");
+                    printf("\n  ⚠️  Selecione um cliente primeiro!\n");
                 } else {
                     ProdutoNavegacao *nav = criarListaNavegacao(*listaProdutos);
                     if (nav) {
@@ -218,146 +240,200 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos){
                         char comando;
                         
                         do {
-                            system("cls");
-                            printf("NAVEGACAO - Adicione produtos com 'A'\n");
-                            Produto *p = atualNav->produto;
-                            printf("\nProduto atual:\n");
-                            printf("Codigo: %d\n", p->codigo);
-                            printf("Nome: %s\n", p->nome);
-                            printf("Preço: R$ %.2f\n", p->preco);
-                            printf("Estoque: %d\n", p->quantidade);
+                            #ifdef _WIN32
+                                system("cls");
+                            #else
+                                system("clear");
+                            #endif
+                            printf("╔═══════════════════════════════════════════════╗\n");
+                            printf("║        NAVEGAÇÃO DE PRODUTOS                  ║\n");
+                            printf("╠═══════════════════════════════════════════════╣\n");
+                            printf("║  Código: %-36d ║\n", atualNav->produto->codigo);
+                            printf("║  Nome: %-38s ║\n", atualNav->produto->nome);
+                            printf("║  Preço: R$ %-33.2f ║\n", atualNav->produto->preco);
+                            printf("║  Estoque: %-35d ║\n", atualNav->produto->quantidade);
+                            printf("╠═══════════════════════════════════════════════╣\n");
+                            printf("║  Comandos:                                   ║\n");
+                            printf("║  [P] Anterior   [N] Próximo                  ║\n");
+                            printf("║  [A] Adicionar  [H] Voltar                   ║\n");
+                            printf("╚═══════════════════════════════════════════════╝\n");
+                            printf("\n  Comando: ");
                             
-                            printf("\nComandos: [P] Anterior, [N] Proximo, [A] Adicionar, [H] Voltar\n");
-                            printf("Comando: ");
                             comando = getchar();
                             getchar();
                             
-                            switch(tolower(comando)) {
+                            switch (tolower(comando)) {
                                 case 'p':
-                                    if (atualNav->ant) atualNav = atualNav->ant;
+                                    if (atualNav->ant) {
+                                        atualNav = atualNav->ant;
+                                    } else {
+                                        printf("\n  ⚠️  Primeiro produto da lista.\n");
+                                        #ifdef _WIN32
+                                            Sleep(1000);
+                                        #else
+                                            sleep(1);
+                                        #endif
+                                    }
                                     break;
+                                    
                                 case 'n':
-                                    if (atualNav->prox) atualNav = atualNav->prox;
+                                    if (atualNav->prox) {
+                                        atualNav = atualNav->prox;
+                                    } else {
+                                        printf("\n  ⚠️  Último produto da lista.\n");
+                                        #ifdef _WIN32
+                                            Sleep(1000);
+                                        #else
+                                            sleep(1);
+                                        #endif
+                                    }
                                     break;
+                                    
                                 case 'a': {
                                     int quantidade;
-                                    printf("Quantidade: ");
+                                    printf("\n  Quantidade: ");
                                     scanf("%d", &quantidade);
                                     getchar();
                                     
-                                    if (adicionarAoCarrinho(carrinhoAtual, p, quantidade)) {
-                                        printf("Produto adicionado ao carrinho!\n");
+                                    if (adicionarAoCarrinho(clienteAtual->carrinho, 
+                                                          atualNav->produto, 
+                                                          quantidade)) {
+                                        printf("\n  ✅ Produto adicionado ao carrinho!\n");
                                     }
-                                    system("sleep 1");
+                                    #ifdef _WIN32
+                                        Sleep(1500);
+                                    #else
+                                        sleep(1);
+                                    #endif
                                     break;
                                 }
                             }
-                        } while(tolower(comando) != 'h');
+                        } while (tolower(comando) != 'h');
                         
-                        // tem que liberar a memória da navegação
-                        // (lembrar de implementar função: liberarListaNavegacao)
+                        liberarListaNavegacao(&nav);
                     }
                 }
+                printf("\n  Pressione Enter para continuar...");
+                getchar();
                 break;
             }
+            
             case 3: {
                 if (!clienteAtual) {
-                    printf("Selecione um cliente primeiro!\n");
+                    printf("\n  ⚠️  Selecione um cliente primeiro!\n");
                 } else {
                     int codigo, quantidade;
-                    printf("Codigo do produto: ");
+                    printf("\n  Código do produto: ");
                     scanf("%d", &codigo);
+                    getchar();
                     
                     Produto *p = buscarProdutoPorCodigo(*listaProdutos, codigo);
                     if (p) {
-                        printf("Produto: %s (R$ %.2f)\n", p->nome, p->preco);
-                        printf("Quantidade: ");
+                        printf("\n  Produto encontrado: %s (R$ %.2f)\n", p->nome, p->preco);
+                        printf("  Quantidade: ");
                         scanf("%d", &quantidade);
+                        getchar();
                         
-                        if (adicionarAoCarrinho(carrinhoAtual, p, quantidade)) {
-                            printf("Produto adicionado ao carrinho!\n");
+                        if (adicionarAoCarrinho(clienteAtual->carrinho, p, quantidade)) {
+                            printf("\n  ✅ Produto adicionado ao carrinho!\n");
                         }
                     } else {
-                        printf("Produto nAo encontrado.\n");
+                        printf("\n  ❌ Produto não encontrado.\n");
                     }
                 }
-                printf("Pressione Enter para continuar...");
-                getchar();
+                printf("\n  Pressione Enter para continuar...");
                 getchar();
                 break;
             }
+            
             case 4: {
                 if (!clienteAtual) {
-                    printf("Selecione um cliente primeiro!\n");
+                    printf("\n  ⚠️  Selecione um cliente primeiro!\n");
                 } else {
                     char nome[100];
                     int quantidade;
                     
-                    printf("Nome do produto: ");
+                    printf("\n  Nome do produto: ");
                     fgets(nome, sizeof(nome), stdin);
                     nome[strcspn(nome, "\n")] = 0;
                     
                     Produto *p = buscarProdutoPorNome(*listaProdutos, nome);
                     if (p) {
-                        printf("Produto: %s (R$ %.2f)\n", p->nome, p->preco);
-                        printf("Quantidade: ");
+                        printf("\n  Produto encontrado: %s (R$ %.2f)\n", p->nome, p->preco);
+                        printf("  Quantidade: ");
                         scanf("%d", &quantidade);
+                        getchar();
                         
-                        if (adicionarAoCarrinho(carrinhoAtual, p, quantidade)) {
-                            printf("Produto adicionado ao carrinho!\n");
+                        if (adicionarAoCarrinho(clienteAtual->carrinho, p, quantidade)) {
+                            printf("\n  ✅ Produto adicionado ao carrinho!\n");
                         }
                     } else {
-                        printf("Produto nao encontrado.\n");
+                        printf("\n  ❌ Produto não encontrado.\n");
                     }
                 }
-                printf("Pressione Enter para continuar...");
+                printf("\n  Pressione Enter para continuar...");
                 getchar();
                 break;
             }
+            
             case 5:
-                if (carrinhoAtual) {
-                    listarCarrinho(carrinhoAtual);
+                if (clienteAtual && clienteAtual->carrinho) {
+                    listarCarrinho(clienteAtual->carrinho);
                 } else {
-                    printf("Carrinho vazio.\n");
+                    printf("\n  🛒 Carrinho vazio.\n");
                 }
-                printf("\nPressione Enter para continuar...");
+                printf("\n  Pressione Enter para continuar...");
                 getchar();
                 break;
+                
             case 6: {
-                if (carrinhoAtual) {
+                if (clienteAtual && clienteAtual->carrinho) {
                     int codigo;
-                    listarCarrinho(carrinhoAtual);
-                    printf("\nCodigo do produto a remover: ");
+                    listarCarrinho(clienteAtual->carrinho);
+                    printf("\n  Código do produto a remover: ");
                     scanf("%d", &codigo);
+                    getchar();
                     
-                    if (removerDoCarrinho(carrinhoAtual, codigo)) {
-                        printf("Produto removido do carrinho.\n");
+                    if (removerDoCarrinho(clienteAtual->carrinho, codigo)) {
+                        printf("\n  ✅ Produto removido do carrinho.\n");
                     }
                 } else {
-                    printf("Carrinho vazio.\n");
+                    printf("\n  🛒 Carrinho vazio.\n");
                 }
-                printf("Pressione Enter para continuar...");
-                getchar();
+                printf("\n  Pressione Enter para continuar...");
                 getchar();
                 break;
             }
+            
             case 7:
-                if (clienteAtual && carrinhoAtual) {
-                    finalizarCompra(carrinhoAtual, clienteAtual);
+                if (clienteAtual && clienteAtual->carrinho) {
+                    finalizarCompra(clienteAtual->carrinho, clienteAtual);
                 } else {
-                    printf("Selecione um cliente e adicione produtos ao carrinho primeiro!\n");
+                    printf("\n  ⚠️  Selecione um cliente e adicione produtos primeiro!\n");
                 }
-                printf("\nPressione Enter para continuar...");
+                printf("\n  Pressione Enter para continuar...");
                 getchar();
                 break;
+                
             case 0:
-                if (carrinhoAtual) {
-                    liberarCarrinho(carrinhoAtual);
-                }
-                printf("Voltando ao menu principal...\n");
+                printf("\n  🔙 Voltando ao menu principal...\n");
+                #ifdef _WIN32
+                    Sleep(1000);
+                #else
+                    sleep(1);
+                #endif
+                break;
+                
+            default:
+                printf("\n  ❌ Opção inválida!\n");
+                #ifdef _WIN32
+                    Sleep(1000);
+                #else
+                    sleep(1);
+                #endif
                 break;
         }
-    } while(opcao != 0);
+    } while (opcao != 0);
 }
 
 void liberarCarrinho(Carrinho *carrinho) {

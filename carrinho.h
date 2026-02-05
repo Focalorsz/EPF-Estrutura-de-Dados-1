@@ -1,10 +1,10 @@
 #ifndef CARRINHO_H
 #define CARRINHO_H
 
-#include "produtos.h"
-#include "clientes.h"
+typedef struct cliente Cliente;
+typedef struct produto Produto;
 
-typedef struct item_carrinho{
+typedef struct item_carrinho {
     Produto *produto;
     int quantidade_desejada;
     struct item_carrinho *prox;
@@ -19,13 +19,10 @@ typedef struct carrinho {
 
 Carrinho* criarCarrinho();
 void liberarCarrinho(Carrinho *carrinho);
-
-int adicionarAoCarrinho(Carrinho *carrinho,Produto * produto, int quantidade);
-int removerDoCarrinho(Carrinho * carrinho, int codigoProduto);
+int adicionarAoCarrinho(Carrinho *carrinho, Produto *produto, int quantidade);
+int removerDoCarrinho(Carrinho *carrinho, int codigoProduto);
 void listarCarrinho(Carrinho *carrinho);
-float calcularTotalCarrinho(Carrinho *carrinho);
-int finalizarCompra(Carrinho *carrinho, Cliente * cliente);
-
+int finalizarCompra(Carrinho *carrinho, Cliente *cliente);
 void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos);
 
 #endif

@@ -1,10 +1,19 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include "clientes.h"
+#include "carrinho.h"
 
 void menuGerenciarClientes(Cliente **listaClientes){
     int opcao = -1;
 
     do {
-        system("cls"); 
+        #ifdef _WIN32
+            system("cls");
+        #else
+            system("clear");
+        #endif 
         printf("----------------- GESTAO DE CLIENTES -----------------\n");
         printf("* (1) Cadastrar Cliente                   *\n");
         printf("* (2) Listar Clientes                     *\n");
@@ -71,7 +80,18 @@ void cadastrarCliente(Cliente **lista){
         return;
     }
 
+    novo->carrinho = criarCarrinho();
+    if(!novo->carrinho) {
+        free(novo);
+        printf("Erro: Não foi possível criar carrinho!\n");
+        return;
+    }
+
+    #ifdef _WIN32
     system("cls");
+    #else
+    system("clear");
+    #endif
     printf("---------- CADASTRO DE CLIENTE ----------\n");
     
     getchar(); //limpa '\n' do scanf
@@ -99,7 +119,11 @@ void cadastrarCliente(Cliente **lista){
 
 void listarClientes(Cliente *lista) {
     Cliente *atual = lista; 
+    #ifdef _WIN32
     system("cls");
+    #else
+    system("clear");
+    #endif
     printf("----------------- LISTA DE CLIENTES -----------------\n");
 
     if (atual == NULL) {
@@ -125,7 +149,11 @@ void buscarCliente(Cliente *lista, char cpf[]) {
     Cliente *atual = lista;
     int encontrado = 0;
 
+    #ifdef _WIN32
     system("cls");
+    #else
+    system("clear");
+    #endif
     printf("---------- BUSCAR CLIENTE ----------\n");
 
     while (atual != NULL) {
@@ -181,7 +209,11 @@ void removerCliente(Cliente **lista) {
 
 void editarCliente(Cliente *lista) {
     char cpf[12];
+    #ifdef _WIN32
     system("cls");
+    #else
+    system("clear");
+    #endif
     printf("---------- EDITAR CLIENTE ----------\n");
     printf("Digite o CPF do cliente: ");
     scanf("%s", cpf);
@@ -213,3 +245,22 @@ void editarCliente(Cliente *lista) {
     sleep(1);
 }
 
+void liberarTodosClientes(Cliente **lista) {
+    if (!lista || !*lista) return;
+    
+    Cliente *atual = *lista;
+    Cliente *proximo;
+    
+    while (atual != NULL) {
+        proximo = atual->prox;
+        
+        if (atual->carrinho != NULL) {
+            liberarCarrinho(atual->carrinho);
+        }
+        
+        free(atual);
+        atual = proximo;
+    }
+    
+    *lista = NULL;
+}

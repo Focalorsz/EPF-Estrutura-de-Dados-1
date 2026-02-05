@@ -219,74 +219,92 @@ atual = atual->prox;
     return cabeca;
 }
 
-void navegarProdutos(ProdutoNavegacao *navegacao){
-    if (!navegacao){
-        printf("Nenhum produto disponivel para navegacao.\n");
+void navegarProdutos(ProdutoNavegacao *navegacao) {
+    if (!navegacao) {
+        printf("Nenhum produto disponível para navegação.\n");
         return;
     }
 
-ProdutoNavegacao *atual = navegacao;
-char comando;
+    ProdutoNavegacao *atual = navegacao;
+    char comando;
 
-do{
-    system("cls");
-    printf("╔──────────────────────────────────────────╗\n");
-    printf("│           『Navegacao de Produtos』        │");
-    printf("╚──────────────────────────────────────────╝\n");
+    do {
+        #ifdef _WIN32
+            system("cls");
+        #else
+            system("clear");
+        #endif
+        printf("╔═══════════════════════════════════════════════╗\n");
+        printf("║        NAVEGAÇÃO DE PRODUTOS (Visual)         ║\n");
+        printf("╠═══════════════════════════════════════════════╣\n");
+        printf("║  Código: %-36d ║\n", atual->produto->codigo);
+        printf("║  Nome: %-38s ║\n", atual->produto->nome);
+        printf("║  Preço: R$ %-33.2f ║\n", atual->produto->preco);
+        printf("║  Estoque: %-35d ║\n", atual->produto->quantidade);
+        printf("╠═══════════════════════════════════════════════╣\n");
+        printf("║  Comandos:                                   ║\n");
+        printf("║  [P] Produto anterior                        ║\n");
+        printf("║  [N] Próximo produto                         ║\n");
+        printf("║  [H] Voltar ao menu                          ║\n");
+        printf("╚═══════════════════════════════════════════════╝\n");
+        printf("\n  Comando: ");
 
-    Produto *p = atual->produto;
-    printf("Codigo: %d\n", p->codigo);
-    printf("Nome: %s\n",p->nome);
-    printf("Preco: R$ %.2f\n",p->preco);
-    printf("Estoque: %d unidades\n", p->quantidade);
+        comando = getchar();
+        getchar();
 
-    printf("\nComandos:\n");
-    printf("[P] Produto anterior\n");
-    printf("[N] Proximo produto\n");
-    printf("[A] Adicionar ao carrinho\n");
-    printf("[H] Voltar ao menu\n");
-    printf("╚──────────────────────────────────────────╝\n");
-    printf("Comando: ");
-
-    comando = getchar();
-    getchar();
-
-    switch(tolower(comando)){
-        case 'p':
-            if (atual->ant){
-                atual = atual->ant;
-            } else{
-                printf("Primeiro produto da lista.\n");
-                system("sleep 2");
-            }
-            break;
-            case 'n':
-                if (atual->prox){
-                    atual = atual->prox;
-                } else{
-                    printf("Ultimo produto da lista.\n");
-                    system("sleep 2");
-            }
-            break;
-            case 'a':
-            printf("Adicionando ao carrinho...\n");
-            system("sleep 2");
-            break;
-            case 'h':
-            printf("Voltando ao menu...\n");
-            break;
-            default:
-            printf("Comando invalido\n");
-            system("sleep 2");
+        switch(tolower(comando)) {
+            case 'p':
+                if (atual->ant) {
+                    atual = atual->ant;
+                } else {
+                    printf("\n  ⚠️  Primeiro produto da lista.\n");
+                    #ifdef _WIN32
+                        Sleep(1000);
+                    #else
+                        sleep(1);
+                    #endif
                 }
-    }while (tolower(comando) != 'h');
+                break;
+            case 'n':
+                if (atual->prox) {
+                    atual = atual->prox;
+                } else {
+                    printf("\n  ⚠️  Último produto da lista.\n");
+                    #ifdef _WIN32
+                        Sleep(1000);
+                    #else
+                        sleep(1);
+                    #endif
+                }
+                break;
+            case 'h':
+                printf("\n  🔙 Voltando ao menu...\n");
+                #ifdef _WIN32
+                    Sleep(1000);
+                #else
+                    sleep(1);
+                #endif
+                break;
+            default:
+                printf("\n  ❌ Comando inválido!\n");
+                #ifdef _WIN32
+                    Sleep(1000);
+                #else
+                    sleep(1);
+                #endif
+        }
+    } while(tolower(comando) != 'h');
 }   
 
 void menuGerenciarProdutos(Produto **lista) {
     int opcao;
 
     do {
+        #ifdef _WIN32
         system("cls");
+        #else
+        system("clear");
+        #endif
         printf("========================================\n");
         printf("       GERENCIAMENTO DE PRODUTOS\n");
         printf("========================================\n");
@@ -407,7 +425,26 @@ void menuGerenciarProdutos(Produto **lista) {
                 break;
             default:
                 printf("Opcaoo invalida!\n");
-                system("sleep 2");
+                #ifdef _WIN32
+                Sleep(1000);
+                #else
+                sleep(1);
+                #endif
         }
     } while(opcao != 0);
+}
+
+void liberarListaNavegacao(ProdutoNavegacao **lista) {
+    if (!lista || !*lista) return;
+    
+    ProdutoNavegacao *atual = *lista;
+    ProdutoNavegacao *proximo;
+    
+    while (atual != NULL) {
+        proximo = atual->prox;
+        free(atual);
+        atual = proximo;
+    }
+    
+    *lista = NULL;
 }

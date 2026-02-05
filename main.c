@@ -13,7 +13,11 @@ int main() {
 
     int opcao = -1;
     do {
+        #ifdef _WIN32
         system("cls");
+        #else
+        system("clear");
+        #endif
         printf("----------------- SISTEMA DE VENDAS -----------------\n");
         printf("* (1) Gerenciamento de Clientes                    *\n");
         printf("* (2) Gerenciamento de Produtos                    *\n");
@@ -47,7 +51,7 @@ int main() {
     } while(opcao != 0);
 
 
-
+    liberarTodosClientes(&listaClientes);
     liberarTodosProdutos(&listaProdutos);
     return 0;
 }
