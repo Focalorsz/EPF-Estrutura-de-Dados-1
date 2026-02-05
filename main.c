@@ -1,3 +1,4 @@
+#include "portabilidade.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "clientes.h"
@@ -13,11 +14,7 @@ int main() {
 
     int opcao = -1;
     do {
-        #ifdef _WIN32
-        system("cls");
-        #else
-        system("clear");
-        #endif
+        clear_screen();
         printf("----------------- SISTEMA DE VENDAS -----------------\n");
         printf("* (1) Gerenciamento de Clientes                    *\n");
         printf("* (2) Gerenciamento de Produtos                    *\n");
@@ -46,7 +43,7 @@ int main() {
                 break;
             default:
                 printf("\nOpcao invalida!\n");
-                sleep(1);
+                delay(1);
         }
     } while(opcao != 0);
 

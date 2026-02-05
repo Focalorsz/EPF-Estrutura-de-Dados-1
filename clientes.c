@@ -1,3 +1,4 @@
+#include "portabilidade.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,11 +10,7 @@ void menuGerenciarClientes(Cliente **listaClientes){
     int opcao = -1;
 
     do {
-        #ifdef _WIN32
-            system("cls");
-        #else
-            system("clear");
-        #endif 
+        clear_screen();
         printf("----------------- GESTAO DE CLIENTES -----------------\n");
         printf("* (1) Cadastrar Cliente                   *\n");
         printf("* (2) Listar Clientes                     *\n");
@@ -28,7 +25,7 @@ void menuGerenciarClientes(Cliente **listaClientes){
         if (scanf("%d", &opcao) != 1) {
             printf("Erro: Digite apenas numeros!\n");
             while (getchar() != '\n'); 
-            sleep(1);
+            delay(1);
             continue;
         }
 
@@ -58,12 +55,12 @@ void menuGerenciarClientes(Cliente **listaClientes){
 
             case 0:
                 printf("\nSaindo do modulo de clientes...\n");
-                sleep(1);
+                delay(1);
                 break;
 
             default:
                 printf("\nOpcao Invalida! Tente novamente.\n");
-                sleep(1);
+                delay(1);
                 break;
         }
 
@@ -76,7 +73,7 @@ void cadastrarCliente(Cliente **lista){
 
     if(novo == NULL){
         printf("Erro: Falha na alocacao da memoria!\n");
-        sleep(2);
+        delay(1);
         return;
     }
 
@@ -87,11 +84,7 @@ void cadastrarCliente(Cliente **lista){
         return;
     }
 
-    #ifdef _WIN32
-    system("cls");
-    #else
-    system("clear");
-    #endif
+    clear_screen();
     printf("---------- CADASTRO DE CLIENTE ----------\n");
     
     getchar(); //limpa '\n' do scanf
@@ -114,16 +107,12 @@ void cadastrarCliente(Cliente **lista){
     *lista = novo;
 
     printf("\nCliente cadastrado com sucesso!\n");
-    sleep(1);
+    delay(1);
 }
 
 void listarClientes(Cliente *lista) {
     Cliente *atual = lista; 
-    #ifdef _WIN32
-    system("cls");
-    #else
-    system("clear");
-    #endif
+    clear_screen();
     printf("----------------- LISTA DE CLIENTES -----------------\n");
 
     if (atual == NULL) {
@@ -149,11 +138,7 @@ void buscarCliente(Cliente *lista, char cpf[]) {
     Cliente *atual = lista;
     int encontrado = 0;
 
-    #ifdef _WIN32
-    system("cls");
-    #else
-    system("clear");
-    #endif
+    clear_screen();
     printf("---------- BUSCAR CLIENTE ----------\n");
 
     while (atual != NULL) {
@@ -192,7 +177,7 @@ void removerCliente(Cliente **lista) {
 
     if (atual == NULL) {
         printf("Cliente nao encontrado!\n");
-        sleep(1);
+        delay(1);
         return;
     }
 
@@ -204,16 +189,12 @@ void removerCliente(Cliente **lista) {
 
     free(atual); 
     printf("Cliente removido com sucesso!\n");
-    sleep(1);
+    delay(1);
 }
 
 void editarCliente(Cliente *lista) {
     char cpf[12];
-    #ifdef _WIN32
-    system("cls");
-    #else
-    system("clear");
-    #endif
+    clear_screen();
     printf("---------- EDITAR CLIENTE ----------\n");
     printf("Digite o CPF do cliente: ");
     scanf("%s", cpf);
@@ -236,13 +217,12 @@ void editarCliente(Cliente *lista) {
             scanf("%[^\n]", atual->telefone);
 
             printf("\nDados atualizados com sucesso!\n");
-            sleep(1);
             return;
         }
         atual = atual->prox;
     }
     printf("\nCliente nao encontrado!\n");
-    sleep(1);
+    delay(1);
 }
 
 void liberarTodosClientes(Cliente **lista) {

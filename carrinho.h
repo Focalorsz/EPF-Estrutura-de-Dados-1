@@ -14,7 +14,6 @@ typedef struct carrinho {
     ItemCarrinho *itens;
     int total_itens;
     float valor_total;
-    struct carrinho *prox;
 } Carrinho;
 
 Carrinho* criarCarrinho();

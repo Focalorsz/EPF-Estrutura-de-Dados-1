@@ -1,3 +1,4 @@
+#include "portabilidade.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,7 +15,6 @@ Carrinho* criarCarrinho(){
     novo->itens = NULL;
     novo->total_itens = 0;
     novo->valor_total = 0.0;
-    novo->prox = NULL;
 
     return novo;
 }
@@ -83,6 +83,54 @@ int removerDoCarrinho(Carrinho* carrinho, int codigoProduto) {
     return 1;
 }
 
+static Produto* selecionarProdutoPorNome(Produto *listaProdutos) {
+    char nome[100];
+    printf("\n  Nome do produto: ");
+    fgets(nome, sizeof(nome), stdin);
+    nome[strcspn(nome, "\n")] = 0;
+    
+    Produto *atual = listaProdutos;
+    Produto *encontrados[100];
+    int count = 0;
+    
+    while (atual != NULL && count < 100) {
+        if (atual->nome && strcasestr(atual->nome, nome) != NULL) {
+            encontrados[count++] = atual;
+        }
+        atual = atual->prox;
+    }
+    
+    if (count == 0) {
+        printf("\n  ❌ Nenhum produto encontrado.\n");
+        return NULL;
+    }
+    
+    if (count == 1) {
+        printf("\n  Produto encontrado: %s (R$ %.2f)\n", 
+               encontrados[0]->nome, encontrados[0]->preco);
+        return encontrados[0];
+    }
+    
+    printf("\n   Foram encontrados %d produtos:\n", count);
+    for (int i = 0; i < count; i++) {
+        printf("  %d. Código: %d - %s (R$ %.2f)\n", 
+               i+1, encontrados[i]->codigo, 
+               encontrados[i]->nome, encontrados[i]->preco);
+    }
+    
+    printf("\n  Escolha pelo número (1-%d) ou 0 para cancelar: ", count);
+    int escolha;
+    scanf("%d", &escolha);
+    getchar();
+    
+    if (escolha < 1 || escolha > count) {
+        printf("\n  ❌ Seleção cancelada.\n");
+        return NULL;
+    }
+    
+    return encontrados[escolha-1];
+}
+
 void listarCarrinho(Carrinho *carrinho){
     if (!carrinho || !carrinho->itens){
         printf("Carrinho vazio.\n");
@@ -131,11 +179,20 @@ int finalizarCompra(Carrinho *carrinho, Cliente * cliente){
     char confirmacao;
     scanf(" %c",&confirmacao);
 
-    if (tolower(confirmacao) == 's'){
+     if (tolower(confirmacao) == 's'){
         ItemCarrinho *atual = carrinho->itens;
         while (atual != NULL){
-            atual->produto->quantidade -=atual->quantidade_desejada;
-            atual = atual ->prox;
+            if(atual->produto->quantidade < atual->quantidade_desejada) {
+                printf("Erro: Estoque insuficiente para %s\n", atual->produto->nome);
+                return 0;
+            }
+            atual = atual->prox;
+        }
+        
+        atual = carrinho->itens;
+        while (atual != NULL){
+            atual->produto->quantidade -= atual->quantidade_desejada;
+            atual = atual->prox;
         }
 
         printf("Compra finalizada com sucesso!\n");
@@ -165,11 +222,7 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos) {
     Cliente *clienteAtual = NULL;
 
     do {
-        #ifdef _WIN32
-            system("cls");
-        #else
-            system("clear");
-        #endif
+        clear_screen();
         printf("\n╔═══════════════════════════════════════════════╗\n");
         printf("║                 MODO COMPRA                   ║\n");
         printf("╠═══════════════════════════════════════════════╣\n");
@@ -214,7 +267,7 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos) {
                 while (atual != NULL) {
                     if (strcmp(atual->cpf, cpf) == 0) {
                         clienteAtual = atual;
-                        printf("\n  ✅ Cliente selecionado: %s\n", clienteAtual->nome);
+                        printf("\n  Cliente selecionado: %s\n", clienteAtual->nome);
                         encontrado = 1;
                         break;
                     }
@@ -222,7 +275,7 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos) {
                 }
                 
                 if (!encontrado) {
-                    printf("\n  ❌ Cliente não encontrado!\n");
+                    printf("\n  Cliente não encontrado!\n");
                 }
                 
                 printf("\n  Pressione Enter para continuar...");
@@ -232,7 +285,7 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos) {
             
             case 2: {
                 if (!clienteAtual) {
-                    printf("\n  ⚠️  Selecione um cliente primeiro!\n");
+                    printf("\n   Selecione um cliente primeiro!\n");
                 } else {
                     ProdutoNavegacao *nav = criarListaNavegacao(*listaProdutos);
                     if (nav) {
@@ -240,11 +293,7 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos) {
                         char comando;
                         
                         do {
-                            #ifdef _WIN32
-                                system("cls");
-                            #else
-                                system("clear");
-                            #endif
+                            clear_screen();
                             printf("╔═══════════════════════════════════════════════╗\n");
                             printf("║        NAVEGAÇÃO DE PRODUTOS                  ║\n");
                             printf("╠═══════════════════════════════════════════════╣\n");
@@ -267,12 +316,8 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos) {
                                     if (atualNav->ant) {
                                         atualNav = atualNav->ant;
                                     } else {
-                                        printf("\n  ⚠️  Primeiro produto da lista.\n");
-                                        #ifdef _WIN32
-                                            Sleep(1000);
-                                        #else
-                                            sleep(1);
-                                        #endif
+                                        printf("\n   Primeiro produto da lista.\n");
+                                        delay(1);
                                     }
                                     break;
                                     
@@ -280,33 +325,52 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos) {
                                     if (atualNav->prox) {
                                         atualNav = atualNav->prox;
                                     } else {
-                                        printf("\n  ⚠️  Último produto da lista.\n");
-                                        #ifdef _WIN32
-                                            Sleep(1000);
-                                        #else
-                                            sleep(1);
-                                        #endif
+                                        printf("\n   Último produto da lista.\n");
+                                        delay(1);
                                     }
                                     break;
                                     
                                 case 'a': {
                                     int quantidade;
-                                    printf("\n  Quantidade: ");
-                                    scanf("%d", &quantidade);
-                                    getchar();
+                                    printf("\n  Quantidade (0 para cancelar): ");
                                     
-                                    if (adicionarAoCarrinho(clienteAtual->carrinho, 
-                                                          atualNav->produto, 
-                                                          quantidade)) {
-                                        printf("\n  ✅ Produto adicionado ao carrinho!\n");
+                                    char input[10];
+                                    fgets(input, sizeof(input), stdin);
+                                    
+                                    if (sscanf(input, "%d", &quantidade) == 1) {
+                                        if (quantidade > 0) {
+                                            if (adicionarAoCarrinho(clienteAtual->carrinho, 
+                                                                atualNav->produto, 
+                                                                quantidade)) {
+                                                printf("\n  Produto adicionado ao carrinho!\n");
+                                                delay(1);
+                                            } else {
+                                                printf("\n  Não foi possível adicionar.\n");
+                                                delay(1);
+                                            }
+                                        } else if (quantidade == 0) {
+                                            printf("\n  Operação cancelada.\n");
+                                            delay(1);
+                                        } else {
+                                            printf("\n  Quantidade inválida!\n");
+                                            delay(1);
+                                        }
+                                    } else {
+                                        printf("\n  Entrada inválida!\n");
+                                        delay(1);
                                     }
-                                    #ifdef _WIN32
-                                        Sleep(1500);
-                                    #else
-                                        sleep(1);
-                                    #endif
                                     break;
                                 }
+                                
+                                case 'h':
+                                    printf("\n  Voltando ao menu de compra...\n");
+                                    delay(1);
+                                    break;
+                                    
+                                default:
+                                    printf("\n  Comando inválido! Use P, N, A ou H.\n");
+                                    delay(1);
+                                    break;
                             }
                         } while (tolower(comando) != 'h');
                         
@@ -316,11 +380,11 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos) {
                 printf("\n  Pressione Enter para continuar...");
                 getchar();
                 break;
-            }
+            }  
             
             case 3: {
                 if (!clienteAtual) {
-                    printf("\n  ⚠️  Selecione um cliente primeiro!\n");
+                    printf("\n   Selecione um cliente primeiro!\n");
                 } else {
                     int codigo, quantidade;
                     printf("\n  Código do produto: ");
@@ -338,7 +402,7 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos) {
                             printf("\n  ✅ Produto adicionado ao carrinho!\n");
                         }
                     } else {
-                        printf("\n  ❌ Produto não encontrado.\n");
+                        printf("\n  Produto não encontrado.\n");
                     }
                 }
                 printf("\n  Pressione Enter para continuar...");
@@ -348,27 +412,18 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos) {
             
             case 4: {
                 if (!clienteAtual) {
-                    printf("\n  ⚠️  Selecione um cliente primeiro!\n");
+                    printf("\n   Selecione um cliente primeiro!\n");
                 } else {
-                    char nome[100];
-                    int quantidade;
-                    
-                    printf("\n  Nome do produto: ");
-                    fgets(nome, sizeof(nome), stdin);
-                    nome[strcspn(nome, "\n")] = 0;
-                    
-                    Produto *p = buscarProdutoPorNome(*listaProdutos, nome);
+                    Produto *p = selecionarProdutoPorNome(*listaProdutos);
                     if (p) {
-                        printf("\n  Produto encontrado: %s (R$ %.2f)\n", p->nome, p->preco);
+                        int quantidade;
                         printf("  Quantidade: ");
                         scanf("%d", &quantidade);
                         getchar();
                         
                         if (adicionarAoCarrinho(clienteAtual->carrinho, p, quantidade)) {
-                            printf("\n  ✅ Produto adicionado ao carrinho!\n");
+                            printf("\n  Produto adicionado ao carrinho!\n");
                         }
-                    } else {
-                        printf("\n  ❌ Produto não encontrado.\n");
                     }
                 }
                 printf("\n  Pressione Enter para continuar...");
@@ -380,7 +435,7 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos) {
                 if (clienteAtual && clienteAtual->carrinho) {
                     listarCarrinho(clienteAtual->carrinho);
                 } else {
-                    printf("\n  🛒 Carrinho vazio.\n");
+                    printf("\n  Carrinho vazio.\n");
                 }
                 printf("\n  Pressione Enter para continuar...");
                 getchar();
@@ -395,10 +450,10 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos) {
                     getchar();
                     
                     if (removerDoCarrinho(clienteAtual->carrinho, codigo)) {
-                        printf("\n  ✅ Produto removido do carrinho.\n");
+                        printf("\n   Produto removido do carrinho.\n");
                     }
                 } else {
-                    printf("\n  🛒 Carrinho vazio.\n");
+                    printf("\n   Carrinho vazio.\n");
                 }
                 printf("\n  Pressione Enter para continuar...");
                 getchar();
@@ -409,7 +464,7 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos) {
                 if (clienteAtual && clienteAtual->carrinho) {
                     finalizarCompra(clienteAtual->carrinho, clienteAtual);
                 } else {
-                    printf("\n  ⚠️  Selecione um cliente e adicione produtos primeiro!\n");
+                    printf("\n   Selecione um cliente e adicione produtos primeiro!\n");
                 }
                 printf("\n  Pressione Enter para continuar...");
                 getchar();
@@ -417,20 +472,12 @@ void menuModoCompra(Cliente **listaClientes, Produto **listaProdutos) {
                 
             case 0:
                 printf("\n  🔙 Voltando ao menu principal...\n");
-                #ifdef _WIN32
-                    Sleep(1000);
-                #else
-                    sleep(1);
-                #endif
+                delay(1);
                 break;
                 
             default:
                 printf("\n  ❌ Opção inválida!\n");
-                #ifdef _WIN32
-                    Sleep(1000);
-                #else
-                    sleep(1);
-                #endif
+                delay(1);
                 break;
         }
     } while (opcao != 0);

@@ -1,8 +1,16 @@
+#include "portabilidade.h"
 #include "produtos.h"
 #include <ctype.h>
 #include <string.h> 
 
-static int proximoCodigo = 1;
+int getProximoCodigo(Produto *lista) {
+    int max = 0;
+    while(lista) {
+        if(lista->codigo > max) max = lista->codigo;
+        lista = lista->prox;
+    }
+    return max + 1;
+}
 
 Produto* criarListaProdutos() {
     return NULL;
@@ -27,20 +35,16 @@ int adicionarProduto(Produto **lista, char *nome,float preco, int quantidade){
         printf("falha na alocacao de memoria!\n");
         return 0;
     }
-    novo->codigo = proximoCodigo++;
+    novo->codigo = getProximoCodigo(*lista);
     novo->nome = strdup(nome);
     novo->preco = preco;
     novo->quantidade = quantidade;
-    novo->prox = NULL;
 
     if (*lista == NULL){
         *lista = novo;
     } else{
-        Produto *atual = *lista;
-        while (atual->prox != NULL) {
-            atual = atual->prox;
-        }
-        atual->prox=novo;
+        novo->prox = *lista;
+        *lista = novo;
     }
     printf("Produto devidamente cadastrado. Codigo: %d\n",novo->codigo);
     return 1;
@@ -104,6 +108,52 @@ Produto* buscarProdutoPorNome(Produto *lista, char *nome){
         atual = atual->prox;
     }
     return NULL;
+}
+
+void buscarEListarProdutosPorNome(Produto *lista, char *nome) {
+    if (!nome || lista == NULL) {
+        printf("Nenhum produto cadastrado.\n");
+        return;
+    }
+
+    printf("╔═══════════════════════════════════════════════╗\n");
+    printf("║      Produtos encontrados com '%.20s'           ║\n", nome);
+    if (strlen(nome) > 20) printf("║                (nome truncado)                ║\n");
+    printf("╠═══════════════════════════════════════════════╣\n");
+    printf("%-6s %-30s %-10s %-10s\n", "CODIGO", "NOME", "PRECO", "ESTOQUE");
+    printf("╠═══════════════════════════════════════════════╣\n");
+
+    Produto *atual = lista;
+    int contador = 0;
+    int encontrados = 0;
+
+    while (atual != NULL) {
+        // Função para comparar case-insensitive
+        char nomeProdutoLower[100];
+        char buscaLower[100];
+        strcpy(nomeProdutoLower, atual->nome);
+        strcpy(buscaLower, nome);
+        
+        // Converter para minúsculas
+        for(int i = 0; nomeProdutoLower[i]; i++) 
+            nomeProdutoLower[i] = tolower(nomeProdutoLower[i]);
+        for(int i = 0; buscaLower[i]; i++) 
+            buscaLower[i] = tolower(buscaLower[i]);
+        
+        if (strstr(nomeProdutoLower, buscaLower) != NULL) {
+            printf("%-6d %-30s R$%-9.2f %-10d\n",
+                   atual->codigo,
+                   atual->nome,
+                   atual->preco,
+                   atual->quantidade);
+            encontrados++;
+        }
+        atual = atual->prox;
+        contador++;
+    }
+
+    printf("╚═══════════════════════════════════════════════╝\n");
+    printf("Encontrados %d de %d produtos\n", encontrados, contador);
 }
 
 void listarTodosProdutos(Produto *lista){
@@ -213,8 +263,8 @@ ProdutoNavegacao* criarListaNavegacao(Produto *listaProdutos){
             cabeca=novo;
         }
 
-ultimo = novo;
-atual = atual->prox;
+    ultimo = novo;
+    atual = atual->prox;
     }
     return cabeca;
 }
@@ -229,11 +279,7 @@ void navegarProdutos(ProdutoNavegacao *navegacao) {
     char comando;
 
     do {
-        #ifdef _WIN32
-            system("cls");
-        #else
-            system("clear");
-        #endif
+        clear_screen();
         printf("╔═══════════════════════════════════════════════╗\n");
         printf("║        NAVEGAÇÃO DE PRODUTOS (Visual)         ║\n");
         printf("╠═══════════════════════════════════════════════╣\n");
@@ -258,11 +304,7 @@ void navegarProdutos(ProdutoNavegacao *navegacao) {
                     atual = atual->ant;
                 } else {
                     printf("\n  ⚠️  Primeiro produto da lista.\n");
-                    #ifdef _WIN32
-                        Sleep(1000);
-                    #else
-                        sleep(1);
-                    #endif
+                    delay(1);
                 }
                 break;
             case 'n':
@@ -270,28 +312,16 @@ void navegarProdutos(ProdutoNavegacao *navegacao) {
                     atual = atual->prox;
                 } else {
                     printf("\n  ⚠️  Último produto da lista.\n");
-                    #ifdef _WIN32
-                        Sleep(1000);
-                    #else
-                        sleep(1);
-                    #endif
+                    delay(1);
                 }
                 break;
             case 'h':
                 printf("\n  🔙 Voltando ao menu...\n");
-                #ifdef _WIN32
-                    Sleep(1000);
-                #else
-                    sleep(1);
-                #endif
+                delay(1);
                 break;
             default:
                 printf("\n  ❌ Comando inválido!\n");
-                #ifdef _WIN32
-                    Sleep(1000);
-                #else
-                    sleep(1);
-                #endif
+                delay(1);
         }
     } while(tolower(comando) != 'h');
 }   
@@ -300,11 +330,7 @@ void menuGerenciarProdutos(Produto **lista) {
     int opcao;
 
     do {
-        #ifdef _WIN32
-        system("cls");
-        #else
-        system("clear");
-        #endif
+        clear_screen();
         printf("========================================\n");
         printf("       GERENCIAMENTO DE PRODUTOS\n");
         printf("========================================\n");
@@ -374,16 +400,8 @@ void menuGerenciarProdutos(Produto **lista) {
                 fgets(nome, sizeof(nome), stdin);
                 nome[strcspn(nome, "\n")] = 0;
                 
-                Produto *p = buscarProdutoPorNome(*lista, nome);
-                if (p) {
-                    printf("\nProduto encontrado:\n");
-                    printf("Codigo: %d\n", p->codigo);
-                    printf("Nome: %s\n", p->nome);
-                    printf("Preço: R$ %.2f\n", p->preco);
-                    printf("Estoque: %d\n", p->quantidade);
-                } else {
-                    printf("Produto nao encontrado.\n");
-                }
+                buscarEListarProdutosPorNome(*lista, nome);
+                
                 printf("\nPressione Enter para continuar...");
                 getchar();
                 break;
@@ -425,11 +443,7 @@ void menuGerenciarProdutos(Produto **lista) {
                 break;
             default:
                 printf("Opcaoo invalida!\n");
-                #ifdef _WIN32
-                Sleep(1000);
-                #else
-                sleep(1);
-                #endif
+                delay(1);
         }
     } while(opcao != 0);
 }
