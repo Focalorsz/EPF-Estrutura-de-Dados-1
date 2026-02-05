@@ -5,7 +5,15 @@ Comando para compilar e executar o projeto:
 
 ```
 gcc main.c clientes.c produtos.c carrinho.c -o sistema.exe
+windows
+
+gcc main.c clientes.c produtos.c carrinho.c -o sistema
+linux
 ```
 ```
 .\sistema.exe
+windows
+
+./sistema
+linux
 ```
