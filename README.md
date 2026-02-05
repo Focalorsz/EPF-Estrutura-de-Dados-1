@@ -1,2 +1,19 @@
 # EPF-Estrutura-de-Dados-1
-Trabalho desenvolvido para a dsciplina de Estrutura de Dados oferecida pela UNB onde será desenvolvido um sistema utilizando c.
+Trabalho desenvolvido para a disciplina de Estrutura de Dados oferecida pela UNB onde será desenvolvido um sistema utilizando c.
+
+Comando para compilar e executar o projeto:
+
+```
+gcc main.c clientes.c produtos.c carrinho.c -o sistema.exe
+windows
+
+gcc main.c clientes.c produtos.c carrinho.c -o sistema
+linux
+```
+```
+.\sistema.exe
+windows
+
+./sistema
+linux
+```
