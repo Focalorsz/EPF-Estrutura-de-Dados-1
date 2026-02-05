@@ -79,7 +79,7 @@ void cadastrarCliente(Cliente **lista){
     scanf("%[^\n]", novo -> nome);
     getchar();
 
-    printf("CPF (apenas números): ");
+    printf("CPF (apenas numeros): ");
     scanf("%[^\n]", novo->cpf);
     getchar();
 
